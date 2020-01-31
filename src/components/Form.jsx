@@ -7,8 +7,15 @@ import update from 'immutability-helper';
 import {Select} from "@material-ui/core";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import InputLabel from "@material-ui/core/InputLabel";
+import {
+  MuiPickersUtilsProvider,
+  DatePicker,
+} from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 import Button from "@material-ui/core/Button";
 import {format} from 'date-fns'
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from '@material-ui/lab/Alert';
 
 const contactOptions = ['mobile', 'home']
 
@@ -145,13 +152,31 @@ export class DynamicForm extends React.Component {
     // schema // name, dob, gender, contact, require guardian consent, guardianDetails
 
     return <>
+      <Snackbar open={this.state.$internal.msgOpen} autoHideDuration={6000}>
+        <MuiAlert elevation={6} variant="filled">
+          {this.state.$internal.msg}
+        </MuiAlert>
+      </Snackbar>
       <form onSubmit={this.submit}>
         <FormControl>
           {
             this.props.schema.includes('name') &&
             <TextField label='name' required onChange={e => this.handleChange(e, 'name')}/>
           }
-          {/* put date picker here */}
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            {this.props.schema.includes('dob') && <DatePicker
+                disableToolbar
+                variant="inline"
+                format="yyyy-MM-dd"
+                maxDate={this.getMaxDate()}
+                label="Date of birth"
+                value={this.state.dob}
+                onChange={(v) => this.handleDateChange(v, 'dob')}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+            />}
+          </MuiPickersUtilsProvider>
           {this.props.schema.includes('gender') && <FormControl>
             <InputLabel>gender</InputLabel>
             <Select
